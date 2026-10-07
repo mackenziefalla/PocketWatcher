@@ -18,15 +18,17 @@ class AiCoachScreen extends StatefulWidget {
 class _AiCoachScreenState extends State<AiCoachScreen> {
   final TextEditingController messageController = TextEditingController();
 
+  final ScrollController scrollController = ScrollController();
+
   final List<ChatMessage> messages = [
     const ChatMessage(
       text:
-          'Hi! I’m your PocketWatcher AI Coach. I can help you understand your budget, spending, debt, and financial goals.',
+          'Hi! I’m your PocketWatcher Financial Coach. I can help you understand your budget, spending, savings, debt, and financial goals.',
       isUser: false,
     ),
     const ChatMessage(
       text:
-          'Try asking something like: “How should I pay off my debt?”',
+          'Try asking: “What should I pay first?”, “How much should I save?”, or “How does my budget look?”',
       isUser: false,
     ),
   ];
@@ -34,6 +36,7 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
   @override
   void dispose() {
     messageController.dispose();
+    scrollController.dispose();
     super.dispose();
   }
 
@@ -43,6 +46,8 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
     if (text.isEmpty) {
       return;
     }
+
+    final response = _generateResponse(text);
 
     setState(() {
       messages.add(
@@ -54,17 +59,41 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
 
       messages.add(
         ChatMessage(
-          text: _generateResponse(text),
+          text: response,
           isUser: false,
         ),
       );
     });
 
     messageController.clear();
+
+    _scrollToBottom();
+  }
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (scrollController.hasClients) {
+        scrollController.animateTo(
+          scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
+  bool _containsAny(String message, List<String> phrases) {
+    for (final phrase in phrases) {
+      if (message.contains(phrase)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   String _generateResponse(String message) {
-    final lowerMessage = message.toLowerCase();
+    final lowerMessage = message.toLowerCase().trim();
 
     final income = widget.financialData.totalMonthlyIncome;
     final bills = widget.financialData.totalBills;
@@ -73,19 +102,82 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
     final monthlyInterest = widget.financialData.totalMonthlyInterest;
     final debts = widget.financialData.debts;
 
-    if (lowerMessage.contains('snowball') ||
-        lowerMessage.contains('avalanche') ||
-        lowerMessage.contains('pay off') ||
-        lowerMessage.contains('payoff') ||
-        lowerMessage.contains('which debt') ||
-        lowerMessage.contains('debt strategy') ||
-        lowerMessage.contains('debt first')) {
+    // ==========================================================
+    // SAVINGS QUESTIONS
+    // ==========================================================
+
+    if (_containsAny(
+      lowerMessage,
+      [
+        'saving',
+        'savings',
+        'save',
+        'how much should i save',
+        'how much should i put away',
+        'put in savings',
+        'emergency fund',
+        'save this month',
+      ],
+    )) {
+      return FinancialCoachService.getSavingsRecommendation(
+        income: income,
+        bills: bills,
+        expenses: expenses,
+      );
+    }
+
+    // ==========================================================
+    // DEBT PAYOFF / WHICH DEBT SHOULD I PAY FIRST?
+    // ==========================================================
+
+    if (_containsAny(
+      lowerMessage,
+      [
+        'snowball',
+        'avalanche',
+        'pay off',
+        'payoff',
+        'pay first',
+        'pay this month',
+        'which debt',
+        'which one should i pay',
+        'which should i pay',
+        'what should i pay',
+        'debt strategy',
+        'debt first',
+        'pay down',
+        'highest interest',
+        'highest apr',
+        'lowest balance',
+        'best debt',
+        'debt payoff',
+        'get out of debt',
+      ],
+    )) {
       return FinancialCoachService.getDebtOptimization(
         debts: debts,
       );
     }
 
-    if (lowerMessage.contains('budget')) {
+    // ==========================================================
+    // BUDGET QUESTIONS
+    // ==========================================================
+
+    if (_containsAny(
+      lowerMessage,
+      [
+        'budget',
+        'budgeting',
+        'how does my budget look',
+        'is my budget good',
+        'monthly budget',
+        'afford',
+        'cash flow',
+        'money left',
+        'left over',
+        'leftover',
+      ],
+    )) {
       return FinancialCoachService.getBudgetRecommendation(
         income: income,
         bills: bills,
@@ -93,28 +185,72 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
       );
     }
 
-    if (lowerMessage.contains('spending') ||
-        lowerMessage.contains('spend') ||
-        lowerMessage.contains('expenses')) {
+    // ==========================================================
+    // SPENDING QUESTIONS
+    // ==========================================================
+
+    if (_containsAny(
+      lowerMessage,
+      [
+        'spending',
+        'spend',
+        'expenses',
+        'expense',
+        'spending too much',
+        'cut back',
+        'where am i spending',
+        'where is my money going',
+      ],
+    )) {
       return FinancialCoachService.getSpendingAdvice(
         income: income,
         expenses: expenses,
       );
     }
 
-    if (lowerMessage.contains('debt') ||
-        lowerMessage.contains('credit card') ||
-        lowerMessage.contains('loan')) {
+    // ==========================================================
+    // GENERAL DEBT QUESTIONS
+    // ==========================================================
+
+    if (_containsAny(
+      lowerMessage,
+      [
+        'debt',
+        'credit card',
+        'credit cards',
+        'loan',
+        'loans',
+        'interest',
+        'apr',
+        'owe',
+        'balance',
+      ],
+    )) {
       return FinancialCoachService.getDebtAdvice(
         totalDebt: totalDebt,
         monthlyInterest: monthlyInterest,
       );
     }
 
-    if (lowerMessage.contains('focus') ||
-        lowerMessage.contains('recommend') ||
-        lowerMessage.contains('advice') ||
-        lowerMessage.contains('what should i do')) {
+    // ==========================================================
+    // GENERAL FINANCIAL ADVICE
+    // ==========================================================
+
+    if (_containsAny(
+      lowerMessage,
+      [
+        'focus',
+        'recommend',
+        'recommendation',
+        'advice',
+        'what should i do',
+        'what should i focus on',
+        'financial health',
+        'how am i doing',
+        'what do you think',
+        'help me',
+      ],
+    )) {
       return FinancialCoachService.getGeneralRecommendation(
         income: income,
         bills: bills,
@@ -124,13 +260,17 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
       );
     }
 
-    return FinancialCoachService.getGeneralRecommendation(
-      income: income,
-      bills: bills,
-      expenses: expenses,
-      totalDebt: totalDebt,
-      monthlyInterest: monthlyInterest,
-    );
+    // ==========================================================
+    // FALLBACK
+    // ==========================================================
+
+    return 'I can help you with your budget, spending, savings, and debt. '
+        'Try asking me something like:\n\n'
+        '• How much should I save this month?\n'
+        '• What debt should I pay first?\n'
+        '• How does my budget look?\n'
+        '• Am I spending too much?\n'
+        '• What should I focus on financially?';
   }
 
   @override
@@ -144,6 +284,7 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
         children: [
           Expanded(
             child: ListView.builder(
+              controller: scrollController,
               padding: const EdgeInsets.all(16),
               itemCount: messages.length,
               itemBuilder: (context, index) {
@@ -172,6 +313,7 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
                       message.text,
                       style: const TextStyle(
                         fontSize: 15,
+                        height: 1.4,
                       ),
                     ),
                   ),
@@ -179,6 +321,11 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
               },
             ),
           ),
+
+          // ====================================================
+          // MESSAGE INPUT
+          // ====================================================
+
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
