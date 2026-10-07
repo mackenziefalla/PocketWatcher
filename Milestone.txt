@@ -1,0 +1,47 @@
+ Milestone 1 — Foundation (completed)
+Flutter setup
+Login screen
+Dashboard
+Navigation
+Theme
+
+
+ Milestone 2 — Budgeting (completed)
+Income
+Bills
+Expenses
+Safe-to-Spend
+
+
+ Milestone 3 — Analytics (complete)
+Pie charts
+Spending trends
+Cash flow
+Debt forecasting
+
+
+ Milestone 4 — AI Coach
+Chat interface
+Budget recommendations
+Debt optimization
+Spending advice
+
+
+ Milestone 5 — Accounts
+Firebase
+Login
+User profiles
+Cloud sync
+
+
+ Milestone 6 — Banking
+Plaid integration
+Automatic transaction import
+Categorization
+
+
+ Milestone 7 — Launch
+Beta testing
+Bug fixes
+App Store
+Google Play

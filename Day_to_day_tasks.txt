@@ -1,0 +1,133 @@
+App Architecture
+lib/
+│
+├── models/
+├── screens/
+│   ├── login_screen.dart
+│   ├── dashboard_screen.dart
+│   └── main_navigation.dart
+│
+├── services/
+├── theme/
+│   └── app_theme.dart
+│
+├── widgets/
+│   ├── score_card.dart
+│   └── info_card.dart
+│
+└── main.dart
+
+
+Project Structure 
+PocketWatcher/
+│
+├── app/                  # Flutter project
+├── docs/
+│   ├── Vision.md
+│   ├── Roadmap.md
+│   ├── Changelog.md
+│   ├── Database.md
+│   ├── AI-Coach.md
+│   └── Score-System.md
+│
+├── assets/
+│   ├── logo/
+│   ├── icons/
+│   └── mockups/
+│
+└── README.md
+
+
+Version 0.1 – Login + Dashboard
+Version 0.2 – Budget Tracking
+Version 0.3 – Charts & Analytics
+Version 0.4 – AI Coach
+Version 0.5 – Firebase & User Accounts
+Version 1.0 – App Store Release 
+
+
+Day 1 Summary : 
+*Initialized Flutter project.
+*Designed application architecture.
+*Created login screen.
+*Built initial dashboard.
+*Implemented reusable widgets.
+*Organized project structure.
+*Planned MVP features and roadmap.
+
+Day 2 Summary : 
+*Built the PocketWatcher design system.
+*Refactored project architecture.
+*Created reusable widgets.
+*Redesigned the dashboard.
+*Added Score, Safe to Spend, AI Insight, and Money Timeline components.
+*Implemented bottom navigation.
+*Fixed project errors and tested application.
+
+Day 3 Summary :
+*Enhanced the PocketWatcher dashboard user interface.
+*Personalized the dashboard with a welcome message.
+*Established the application's design blueprint for future development.
+*Designed the Financial Snapshot section.
+*Created the reusable FinancialSnapshot widget.
+*Integrated the Financial Snapshot into the dashboard.
+*Improved the dashboard layout for a more professional fintech appearance.
+*Updated the application architecture to use MainNavigation as the primary entry point.
+*Refactored main.dart to remove duplicate code and improve maintainability.
+*Organized the project into reusable screens and widgets.
+*Successfully resolved navigation and project structure issues.
+*Fixed import, routing, and application startup problems.
+*Tested the application after architecture updates.
+*Planned the next phase of dashboard enhancements and analytics.
+
+Day 4 Summary:
+*Created the UserProfile model.
+*Connected the dashboard to dynamic user data.
+*Added automatic financial calculations (Safe to Spend, Net Worth, Savings Goal).
+*Updated the PocketWatcher Score to use dynamic data.
+*Redesigned the Financial Snapshot widget.
+*Built the Budget screen.
+*Added an interactive budget pie chart.
+*Connected the Budget tab to the bottom navigation.
+*Fixed navigation, widget, and project structure issues.
+*Successfully tested all completed features.
+
+Day 5 Summary:
+*Created Income model and Add Income screen
+*Added pay frequency options
+*Connected income entries to the Budget page
+**Created Expense model and Add Expense screen
+*Added expense categories and dates
+*Connected expenses to the Budget page
+*Made spending pie chart update from expense data
+*Added automatic expense totals
+*Updated Safe-to-Spend calculation using income, bills, and expenses
+*Tested Budget features locally
+
+Day 6 Summary: 
+*Added Spending Trend chart
+*Connected expenses to weekly spending data
+*Added Cash Flow chart
+*Added income, bills, expenses & net cash flow analytics
+*Created Debt model
+*Created Add Debt screen
+*Created Debt Overview screen
+*Connected Debt screen to navigation
+*Set up foundation for Debt Forecasting
+
+Day 7 Summary: 
+*Added debt payoff forecasting
+*Added Snowball & Avalanche strategies
+*Built AI Coach chat interface
+*Added budget, spending & debt guidance
+*Created shared financial data
+*Connected Budget, Debt & AI Coach
+*AI Coach now uses entered financial data
+*Tested everything successfully
+
+Day 8 Summary:
+*Added debt optimization logic to the AI Coach
+*Connected Snowball & Avalanche strategies to AI Coach responses
+*Made debt recommendations use the user's actual debt information
+*Tested “Which debt should I pay off first?” successfully
+*Completed the Debt Optimization portion of Milestone 4
