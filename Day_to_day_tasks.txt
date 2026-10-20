@@ -131,3 +131,15 @@ Day 8 Summary:
 *Made debt recommendations use the user's actual debt information
 *Tested “Which debt should I pay off first?” successfully
 *Completed the Debt Optimization portion of Milestone 4
+
+Day 9 Summary:
+*Reviewed the full project and launch roadmap with a focus on launch blockers
+*Added local data persistence using the shared_preferences package
+*Added toMap/fromMap serialization to the FinancialData model
+*Created StorageService to save, load, and clear financial data on the device
+*Updated MainNavigation to load saved data on startup and auto-save on tab switches and app backgrounding
+*Tested persistence successfully — income, bills, expenses, and debts all survive a full app restart
+*Fixed Spending Trend chart axis labels repeating on wide screens
+*Removed the curved line that dipped below $0 and misrepresented weekly spending
+*Improved the Spending Trend insight text to name the biggest spending week
+*Verified all Budget screen totals (income, bills, expenses, net cash flow, safe-to-spend) reconcile correctly

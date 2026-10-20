@@ -89,6 +89,7 @@ class SpendingTrendChart extends StatelessWidget {
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
+                        interval: 1, //  one label per week
                         getTitlesWidget: (value, meta) {
                           final week = value.toInt();
 
@@ -119,7 +120,7 @@ class SpendingTrendChart extends StatelessWidget {
                           weeklySpending[index],
                         ),
                       ),
-                      isCurved: true,
+                      isCurved: false, //straight lines, no fake curve
                       barWidth: 4,
                       dotData: const FlDotData(
                         show: true,
@@ -156,26 +157,31 @@ class SpendingTrendChart extends StatelessWidget {
     );
   }
 
+  // honest insight — names your biggest spending week
   String _buildInsight() {
     if (weeklySpending.length < 2) {
       return 'Add more expense history to see spending trends.';
     }
 
-    final first = weeklySpending.first;
-    final last = weeklySpending.last;
+    final total = weeklySpending.fold(0.0, (sum, week) => sum + week);
 
-    if (last > first) {
-      final increase = last - first;
-
-      return 'Weekly spending increased by \$${increase.toStringAsFixed(0)} compared with the beginning of the month.';
+    if (total == 0) {
+      return 'No spending recorded yet this month.';
     }
 
-    if (last < first) {
-      final decrease = first - last;
+    final allEqual =
+        weeklySpending.every((week) => week == weeklySpending.first);
 
-      return 'Weekly spending decreased by \$${decrease.toStringAsFixed(0)} compared with the beginning of the month.';
+    if (allEqual) {
+      return 'Your weekly spending has stayed relatively consistent.';
     }
 
-    return 'Your weekly spending has stayed relatively consistent.';
+    final highest = weeklySpending.reduce(
+      (current, next) => current > next ? current : next,
+    );
+    final highestWeek = weeklySpending.indexOf(highest) + 1;
+
+    return 'Your biggest spending week so far is Week $highestWeek '
+        'at \$${highest.toStringAsFixed(0)}.';
   }
 }

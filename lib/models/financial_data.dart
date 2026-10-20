@@ -80,4 +80,32 @@ class FinancialData {
   void addDebt(Debt debt) {
     debts.add(debt);
   }
+
+  // NEW: turns all your financial data into a map so it can be saved
+  Map<String, dynamic> toMap() {
+    return {
+      'incomes': incomes.map((income) => income.toMap()).toList(),
+      'bills': bills.map((bill) => bill.toMap()).toList(),
+      'expenses': expenses.map((expense) => expense.toMap()).toList(),
+      'debts': debts.map((debt) => debt.toMap()).toList(),
+    };
+  }
+
+  // NEW: rebuilds FinancialData from a saved map when the app loads
+  factory FinancialData.fromMap(Map<String, dynamic> map) {
+    return FinancialData(
+      incomes: (map['incomes'] as List<dynamic>? ?? [])
+          .map((item) => Income.fromMap(item as Map<String, dynamic>))
+          .toList(),
+      bills: (map['bills'] as List<dynamic>? ?? [])
+          .map((item) => Bill.fromMap(item as Map<String, dynamic>))
+          .toList(),
+      expenses: (map['expenses'] as List<dynamic>? ?? [])
+          .map((item) => Expense.fromMap(item as Map<String, dynamic>))
+          .toList(),
+      debts: (map['debts'] as List<dynamic>? ?? [])
+          .map((item) => Debt.fromMap(item as Map<String, dynamic>))
+          .toList(),
+    );
+  }
 }
