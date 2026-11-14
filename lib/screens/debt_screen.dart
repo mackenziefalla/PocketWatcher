@@ -174,7 +174,7 @@ class _DebtScreenState extends State<DebtScreen> {
                                           Text(
                                             '${debt.type.label} • ${debt.interestRate.toStringAsFixed(2)}% APR',
                                             style: TextStyle(
-                                              color: Colors.grey.shade700,
+                                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                                             ),
                                           ),
                                         ],
@@ -251,7 +251,7 @@ class _DebtScreenState extends State<DebtScreen> {
                                     width: double.infinity,
                                     padding: const EdgeInsets.all(12),
                                     decoration: BoxDecoration(
-                                      color: Colors.red.shade50,
+                                      color: Theme.of(context).colorScheme.errorContainer,
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: const Text(
@@ -288,7 +288,7 @@ class _DebtScreenState extends State<DebtScreen> {
           const SizedBox(height: 20),
 
           Card(
-            elevation: 4,
+            
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
@@ -413,7 +413,7 @@ class _SummaryCard extends StatelessWidget {
               title,
               style: TextStyle(
                 fontSize: 13,
-                color: Colors.grey.shade700,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
 
@@ -450,7 +450,7 @@ class _ForecastRow extends StatelessWidget {
           child: Text(
             label,
             style: TextStyle(
-              color: Colors.grey.shade700,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
         ),
@@ -489,7 +489,7 @@ class _StrategyCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey.shade100,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
@@ -520,7 +520,7 @@ class _StrategyCard extends StatelessWidget {
             targetLabel,
             style: TextStyle(
               fontSize: 13,
-              color: Colors.grey.shade700,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
 

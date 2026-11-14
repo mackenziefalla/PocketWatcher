@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/financial_data.dart';
 import '../services/financial_coach_service.dart';
+import '../services/score_service.dart';
 
 class AiCoachScreen extends StatefulWidget {
   final FinancialData financialData;
@@ -28,7 +29,7 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
     ),
     const ChatMessage(
       text:
-          'Try asking: “What should I pay first?”, “How much should I save?”, or “How does my budget look?”',
+          'Try asking: “What’s my score?”, “What should I pay first?”, or “How much should I save?”',
       isUser: false,
     ),
   ];
@@ -103,6 +104,21 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
     final debts = widget.financialData.debts;
 
     // ==========================================================
+    // SCORE QUESTIONS
+    // ==========================================================
+
+    if (_containsAny(
+      lowerMessage,
+      [
+        'score',
+        'points',
+        'how am i doing',
+      ],
+    )) {
+      return _scoreResponse();
+    }
+
+    // ==========================================================
     // SAVINGS QUESTIONS
     // ==========================================================
 
@@ -123,6 +139,8 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
         income: income,
         bills: bills,
         expenses: expenses,
+        currentSavings: widget.financialData.currentSavings,
+        savingsGoal: widget.financialData.savingsGoal,
       );
     }
 
@@ -246,7 +264,6 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
         'what should i do',
         'what should i focus on',
         'financial health',
-        'how am i doing',
         'what do you think',
         'help me',
       ],
@@ -270,7 +287,39 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
         '• What debt should I pay first?\n'
         '• How does my budget look?\n'
         '• Am I spending too much?\n'
-        '• What should I focus on financially?';
+        '• What should I focus on financially?\n'
+        '• How can I raise my score?';
+  }
+
+  // ==========================================================
+  // SCORE RESPONSE
+  // ==========================================================
+
+  String _scoreResponse() {
+    final result = ScoreService.calculate(widget.financialData);
+
+    if (!result.hasEnoughData) {
+      return 'I can calculate your PocketWatcher Score once you add your '
+          'income on the Budget tab.';
+    }
+
+    final weakest = result.pillars
+        .reduce((a, b) => a.progress <= b.progress ? a : b);
+
+    final buffer = StringBuffer()
+      ..write('Your PocketWatcher Score is ${result.score} out of 1000. ')
+      ..write('Your weakest area is ${weakest.name} '
+          '(${weakest.points}/${weakest.maxPoints}): ${weakest.status}');
+
+    final tips = result.tips.where((tip) => tip.pointGain > 0).take(3).toList();
+    if (tips.isNotEmpty) {
+      buffer.write('\n\nFastest ways to raise it:');
+      for (final tip in tips) {
+        buffer.write('\n• ${tip.title} (+${tip.pointGain} pts)');
+      }
+    }
+
+    return buffer.toString();
   }
 
   @override
@@ -305,8 +354,13 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
                     ),
                     decoration: BoxDecoration(
                       color: message.isUser
-                          ? Colors.green.shade100
-                          : Colors.grey.shade100,
+                          ? Theme.of(context)
+                              .colorScheme
+                              .primary
+                              .withValues(alpha: 0.16)
+                          : Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Text(
@@ -332,7 +386,7 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
               color: Theme.of(context).scaffoldBackgroundColor,
               border: Border(
                 top: BorderSide(
-                  color: Colors.grey.shade300,
+                  color: Theme.of(context).colorScheme.outlineVariant,
                 ),
               ),
             ),

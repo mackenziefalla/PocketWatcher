@@ -26,7 +26,8 @@ class BudgetScreen extends StatefulWidget {
 class _BudgetScreenState extends State<BudgetScreen> {
   List<Income> get incomes => widget.financialData.incomes;
   List<Bill> get bills => widget.financialData.bills;
-  List<Expense> get expenses => widget.financialData.expenses;
+  // This month only, so the list, pie chart and weekly trend match the totals.
+  List<Expense> get expenses => widget.financialData.currentMonthExpenses;
 
   double get totalMonthlyIncome {
     return widget.financialData.totalMonthlyIncome;
@@ -180,7 +181,6 @@ class _BudgetScreenState extends State<BudgetScreen> {
           const SizedBox(height: 20),
 
           Card(
-            elevation: 4,
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
@@ -235,7 +235,6 @@ class _BudgetScreenState extends State<BudgetScreen> {
           const SizedBox(height: 18),
 
           Card(
-            elevation: 4,
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
@@ -257,6 +256,16 @@ class _BudgetScreenState extends State<BudgetScreen> {
                     ...bills.map(
                       (bill) => ListTile(
                         contentPadding: EdgeInsets.zero,
+                        // Tap a bill to mark it paid (or unpaid).
+                        onTap: () {
+                          final index =
+                              widget.financialData.bills.indexOf(bill);
+                          if (index < 0) return;
+                          setState(() {
+                            widget.financialData.bills[index] =
+                                bill.copyWith(isPaid: !bill.isPaid);
+                          });
+                        },
                         leading: Icon(
                           bill.isPaid
                               ? Icons.check_circle
@@ -267,7 +276,8 @@ class _BudgetScreenState extends State<BudgetScreen> {
                         ),
                         title: Text(bill.name),
                         subtitle: Text(
-                          '${bill.category.label} • Due ${bill.dueDate.month}/${bill.dueDate.day}/${bill.dueDate.year}',
+                          '${bill.category.label} • Due ${bill.dueDate.month}/${bill.dueDate.day}/${bill.dueDate.year}'
+                          '${bill.isPaid ? ' • Paid' : ' • Tap when paid'}',
                         ),
                         trailing: Text(
                           '\$${bill.amount.toStringAsFixed(0)}',
@@ -296,7 +306,6 @@ class _BudgetScreenState extends State<BudgetScreen> {
           const SizedBox(height: 18),
 
           Card(
-            elevation: 4,
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
@@ -353,7 +362,6 @@ class _BudgetScreenState extends State<BudgetScreen> {
           const SizedBox(height: 18),
 
           Card(
-            elevation: 4,
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
@@ -420,7 +428,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
                         ? 'of \$${totalMonthlyIncome.toStringAsFixed(0)} estimated monthly income'
                         : 'Add income to compare against expenses',
                     style: TextStyle(
-                      color: Colors.grey.shade700,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -486,7 +494,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
                         Text(
                           'Income minus bills and expenses.',
                           style: TextStyle(
-                            color: Colors.grey.shade700,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ],

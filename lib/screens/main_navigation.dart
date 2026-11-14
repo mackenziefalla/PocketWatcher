@@ -6,6 +6,7 @@ import 'ai_coach_screen.dart';
 import 'budget_screen.dart';
 import 'dashboard_screen.dart';
 import 'debt_screen.dart';
+import 'timeline_screen.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
@@ -18,7 +19,7 @@ class _MainNavigationState extends State<MainNavigation>
     with WidgetsBindingObserver {
   int selectedIndex = 0;
 
-  // No longer final — it gets replaced by your saved data on startup
+  // Replaced by your saved data on startup
   FinancialData financialData = FinancialData();
 
   bool isLoading = true;
@@ -36,9 +37,14 @@ class _MainNavigationState extends State<MainNavigation>
     super.dispose();
   }
 
-  // NEW: loads your saved data from the device when the app starts
+  // Loads your saved data from the device when the app starts
   Future<void> _loadData() async {
     final loadedData = await StorageService.loadFinancialData();
+
+    // Move monthly bills to their next due date when needed.
+    if (loadedData.rollBillsForward()) {
+      await StorageService.saveFinancialData(loadedData);
+    }
 
     if (!mounted) {
       return;
@@ -50,7 +56,7 @@ class _MainNavigationState extends State<MainNavigation>
     });
   }
 
-  // NEW: saves automatically when the app is closed or backgrounded
+  // Saves automatically when the app is closed or backgrounded
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused ||
@@ -58,6 +64,15 @@ class _MainNavigationState extends State<MainNavigation>
         state == AppLifecycleState.detached) {
       StorageService.saveFinancialData(financialData);
     }
+  }
+
+  void _selectTab(int index) {
+    // Saves every time you switch tabs
+    StorageService.saveFinancialData(financialData);
+
+    setState(() {
+      selectedIndex = index;
+    });
   }
 
   @override
@@ -72,8 +87,18 @@ class _MainNavigationState extends State<MainNavigation>
     }
 
     final screens = [
-      const DashboardScreen(),
+      DashboardScreen(
+        financialData: financialData,
+        onDataChanged: () {
+          StorageService.saveFinancialData(financialData);
+          setState(() {});
+        },
+        onOpenTimeline: () => _selectTab(2),
+      ),
       BudgetScreen(
+        financialData: financialData,
+      ),
+      TimelineScreen(
         financialData: financialData,
       ),
       DebtScreen(
@@ -88,14 +113,7 @@ class _MainNavigationState extends State<MainNavigation>
       body: screens[selectedIndex],
       bottomNavigationBar: NavigationBar(
         selectedIndex: selectedIndex,
-        onDestinationSelected: (index) {
-          // NEW: saves every time you switch tabs
-          StorageService.saveFinancialData(financialData);
-
-          setState(() {
-            selectedIndex = index;
-          });
-        },
+        onDestinationSelected: _selectTab,
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.dashboard_outlined),
@@ -108,6 +126,11 @@ class _MainNavigationState extends State<MainNavigation>
             label: 'Budget',
           ),
           NavigationDestination(
+            icon: Icon(Icons.calendar_month_outlined),
+            selectedIcon: Icon(Icons.calendar_month),
+            label: 'Timeline',
+          ),
+          NavigationDestination(
             icon: Icon(Icons.credit_card_outlined),
             selectedIcon: Icon(Icons.credit_card),
             label: 'Debt',
@@ -115,7 +138,7 @@ class _MainNavigationState extends State<MainNavigation>
           NavigationDestination(
             icon: Icon(Icons.smart_toy_outlined),
             selectedIcon: Icon(Icons.smart_toy),
-            label: 'AI Coach',
+            label: 'Coach',
           ),
         ],
       ),
